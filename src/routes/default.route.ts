@@ -22,4 +22,5 @@ const router = Router();
  */
 router.get("/", defaultMessage);
 
+
 export default router;
