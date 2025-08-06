@@ -4,11 +4,14 @@ import {
   reactivateAccount,
   findUserByIdService,
 } from "../service/accountDeactivate.service";
+import { deactivateAccountValidationSchema, userIdValidationSchema } from "../validations/zod.validations";
+import z from "zod";
 
 // deactivate user account
 export const deactivateUserAccount = async (req: Request, res: Response) => {
   try {
-    const { id, deactivateReason } = req.body;
+    const validatedData = deactivateAccountValidationSchema.parse(req.body) ;
+    const { id, deactivateReason } = validatedData;
     const userId = parseInt(id);
     if (!userId || !deactivateReason) {
       return res
@@ -38,6 +41,13 @@ export const deactivateUserAccount = async (req: Request, res: Response) => {
         message: "User account deactivated successfully",
       });
   } catch (error) {
+    if (error instanceof z.ZodError) {
+      return res.status(400).json({
+        status: "error",
+        message: "Validation failed",
+        errors: error.issues // contains detailed messages
+      });
+    }
     console.error(error);
     return res
       .status(500)
@@ -49,13 +59,10 @@ export const deactivateUserAccount = async (req: Request, res: Response) => {
 // reactivate user account
 export const reactivateUserAccount = async (req: Request, res: Response) => {
   try {
-    const { id } = req.body;
+    const validatedData = userIdValidationSchema.parse(req.body) ;
+    const { id } = validatedData;
     const userId = parseInt(id);
-    if (!userId) {
-      return res
-        .status(401)
-        .json({ status: "error", message: "User ID is required" });
-    }
+   
     const user = await findUserByIdService(userId);
     if (!user) {
       return res
@@ -79,6 +86,13 @@ export const reactivateUserAccount = async (req: Request, res: Response) => {
         message: "User account reactivated successfully",
       });
   } catch (error) {
+    if (error instanceof z.ZodError) {
+      return res.status(400).json({
+        status: "error",
+        message: "Validation failed",
+        errors: error.issues // contains detailed messages
+      });
+    }
     console.error(error);
     return res
       .status(500)

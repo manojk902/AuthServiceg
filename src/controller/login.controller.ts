@@ -8,21 +8,16 @@ import {
   resetFailedLoginAttempts,
   findAppByUserIdAndAppName
 } from "../service/login.service";
+import { loginValidationSchema } from "../validations/zod.validations";
+import z from "zod";
 
 const MAX_FAILED_LOGIN_ATTEMPTS = 5;
 const LOCK_DURATION_MINUTES = 15;
 
 export const loginUser = async (req: Request, res: Response) => {
   try {
-    const { email, password, app_name  } = req.body;
-
-    // 🛑 Validate fields
-    if (!email || !password || !app_name ) {
-      return res.status(200).json({
-        status: "fill_all_feilds",
-        message: "All fields are required"
-      });
-    }
+    const validatedData = loginValidationSchema.parse(req.body);
+    const { email, password, app_name  } = validatedData;
 
     // 🔍 Find user first
     const user = await findUserByEmail(email);
@@ -120,6 +115,14 @@ export const loginUser = async (req: Request, res: Response) => {
     });
 
   } catch (error) {
+    if (error instanceof z.ZodError) {
+      return res.status(400).json({
+        status: "error",
+        message: "Validation failed",
+        errors: error.issues // contains detailed messages
+      });
+    }
+    
     console.error("Error while login", error);
     return res.status(500).json({
       status: "error",

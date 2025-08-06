@@ -1,15 +1,14 @@
 import { deleteAccountService , recoverDeletedAccountService} from "../service/deleteAccount.service";
 import { Request, Response } from "express";
+import { userIdValidationSchema } from "../validations/zod.validations";
+import z from "zod";
 
 // delete user account
 export const deleteUserAccount = async (req: Request,res: Response) => {
-  const { id } = req.body;
+  const validatedData = userIdValidationSchema.parse(req.body) ;
+  const { id } = validatedData;
   const userId = parseInt(id);
-  if (!userId) {
-    return res
-      .status(400)
-      .json({ status: "error", message: "User ID is required" });
-  }
+  
   try {
     await deleteAccountService(userId);
     return res
@@ -19,6 +18,13 @@ export const deleteUserAccount = async (req: Request,res: Response) => {
         message: "User account deleted successfully",
       });
   } catch (error) {
+    if (error instanceof z.ZodError) {
+      return res.status(400).json({
+        status: "error",
+        message: "Validation failed",
+        errors: error.issues // contains detailed messages
+      });
+    }
     console.error(error);
     return res
       .status(500)
@@ -29,13 +35,10 @@ export const deleteUserAccount = async (req: Request,res: Response) => {
 
 // recover deleted user account
 export const recoverDeletedUserAccount = async (req: Request, res: Response) => {
-  const { id } = req.body;
+  const validatedData = userIdValidationSchema.parse(req.body) ;
+  const { id } = validatedData;
   const userId = parseInt(id);
-  if (!userId) {
-    return res
-      .status(400)
-      .json({ status: "error", message: "User ID is required" });
-  }
+  
   try {
     await recoverDeletedAccountService(userId);
     return res
@@ -45,6 +48,13 @@ export const recoverDeletedUserAccount = async (req: Request, res: Response) => 
         message: "User account recovered successfully",
       });
   } catch (error) {
+    if (error instanceof z.ZodError) {
+      return res.status(400).json({
+        status: "error",
+        message: "Validation failed",
+        errors: error.issues // contains detailed messages
+      });
+    }
     console.error(error);
     return res
       .status(500)
