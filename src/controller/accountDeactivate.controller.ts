@@ -45,7 +45,7 @@ export const deactivateUserAccount = async (req: Request, res: Response) => {
       return res.status(400).json({
         status: "error",
         message: "Validation failed",
-        errors: error.issues // contains detailed messages
+        errors: error.issues 
       });
     }
     console.error(error);
@@ -90,7 +90,7 @@ export const reactivateUserAccount = async (req: Request, res: Response) => {
       return res.status(400).json({
         status: "error",
         message: "Validation failed",
-        errors: error.issues // contains detailed messages
+        errors: error.issues 
       });
     }
     console.error(error);

@@ -19,7 +19,7 @@ export const loginUser = async (req: Request, res: Response) => {
     const validatedData = loginValidationSchema.parse(req.body);
     const { email, password, app_name  } = validatedData;
 
-    // 🔍 Find user first
+    //  Find user first
     const user = await findUserByEmail(email);
 
     if (!user) {
@@ -29,10 +29,10 @@ export const loginUser = async (req: Request, res: Response) => {
       });
     }
 
-    // 🔍 Then find app mapping
+    //  Then find app mapping
     const appName = await findAppByUserIdAndAppName(user.id, app_name );
 
-    // 🔒 Check if account is locked
+    //  Check if account is locked
     if (
       user.account_locked_until &&
       new Date(user.account_locked_until) > new Date()
@@ -46,7 +46,7 @@ export const loginUser = async (req: Request, res: Response) => {
       });
     }
 
-    // ✅ Check password
+    //  Check password
     const isPasswordMatch = await checkPassword(password, user.password);
     if (!isPasswordMatch) {
       const failedLoginAttempts = user.failed_login_attempts + 1;
@@ -65,7 +65,7 @@ export const loginUser = async (req: Request, res: Response) => {
       });
     }
 
-    // 🚫 Check suspended/deactivated/deleted/verified
+    //  Check suspended/deactivated/deleted/verified
     if (user.is_suspended) {
       return res.status(200).json({
         status: "user_suspended",
@@ -94,7 +94,6 @@ export const loginUser = async (req: Request, res: Response) => {
       });
     }
 
-    // 🟢 All good → Reset failed attempts and login
     await resetFailedLoginAttempts(email);
 
     const token = await jwtTokenGenerator(user.id, user.username, user.email, appName.app_name);
@@ -119,10 +118,10 @@ export const loginUser = async (req: Request, res: Response) => {
       return res.status(400).json({
         status: "error",
         message: "Validation failed",
-        errors: error.issues // contains detailed messages
+        errors: error.issues 
       });
     }
-    
+
     console.error("Error while login", error);
     return res.status(500).json({
       status: "error",

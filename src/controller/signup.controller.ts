@@ -17,7 +17,7 @@ export const signup = async (req: Request, res: Response) => {
 
     if (existingUser) {
       if (!existingUser.is_verified) {
-        // 🔁 Resend verification token
+        //  Resend verification token
         const newVerificationToken = crypto.randomBytes(32).toString("hex");
 
         await pool.query(
@@ -39,7 +39,7 @@ export const signup = async (req: Request, res: Response) => {
         });
       }
 
-      // ✅ User is verified → proceed to insert into user_app if needed
+      //  User is verified → proceed to insert into user_app if needed
       const resUser = await signupUser(firstName, lastName, email, password, appName );
 
       return res.status(200).json({
@@ -56,7 +56,7 @@ export const signup = async (req: Request, res: Response) => {
       });
     }
 
-    // 🆕 Brand new user
+    //  Brand new user
     await signupUser(firstName, lastName, email, password, appName );
     return res.status(201).json({
       status: "success",
@@ -95,6 +95,6 @@ export const verifyEmail = async (req: Request, res: Response) => {
 
   const user = rows[0];
 
-  // ✅ Redirect to UI with success and user ID
+  //  Redirect to UI with success and user ID
   return res.redirect(`${process.env.UI_URL}/login?status=activation-success&id=${user.id}`);
 };
