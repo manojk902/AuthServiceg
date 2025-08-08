@@ -7,10 +7,9 @@ import z from "zod";
 export const deleteUserAccount = async (req: Request,res: Response) => {
   const validatedData = userIdValidationSchema.parse(req.body) ;
   const { id } = validatedData;
-  const userId = parseInt(id);
   
   try {
-    await deleteAccountService(userId);
+    await deleteAccountService(id);
     return res
       .status(200)
       .json({
@@ -37,10 +36,9 @@ export const deleteUserAccount = async (req: Request,res: Response) => {
 export const recoverDeletedUserAccount = async (req: Request, res: Response) => {
   const validatedData = userIdValidationSchema.parse(req.body) ;
   const { id } = validatedData;
-  const userId = parseInt(id);
   
   try {
-    await recoverDeletedAccountService(userId);
+    await recoverDeletedAccountService(id);
     return res
       .status(200)
       .json({

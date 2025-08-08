@@ -104,14 +104,8 @@ export const getUserByIdController = async (req: Request, res: Response) => {
   try {
     const validatedData = userIdValidationSchema.parse(req.params);
     const { id } = validatedData;
-    const userId = parseInt(id);
-    if (isNaN(userId)) {
-      return res.status(400).json({
-        status: "error",
-        message: "Invalid user ID"
-      });
-    }
-    const user = await getUserById(userId);
+   
+    const user = await getUserById(id);
     if (!user) {
       return res.status(404).json({
         status: "user_not_found",

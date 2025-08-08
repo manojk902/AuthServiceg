@@ -7,16 +7,9 @@ import z from "zod";
 export const suspendUserAccount = async (req: Request, res: Response) => {
   const validatedData = suspendAccountValidationSchema.parse(req.body) ;
   const { id, suspendReason } = validatedData;
-  const userId = parseInt(id);
-
-  if (!userId || !suspendReason) {
-    return res
-      .status(400)
-      .json({ status: "error", message: "User ID and suspendReason are required" });
-  }
 
   try {
-    await suspendAccountService(userId, suspendReason);
+    await suspendAccountService(id, suspendReason);
     return res
       .status(200)
       .json({
@@ -42,10 +35,9 @@ export const suspendUserAccount = async (req: Request, res: Response) => {
 export const reactivateSuspendedUserAccount = async (req: Request, res: Response) => {
   const validatedData = userIdValidationSchema.parse(req.body) ;
   const { id } = validatedData;
-  const userId = parseInt(id);
 
   try {
-    await reactivateSuspendedAccountService(userId);
+    await reactivateSuspendedAccountService(id);
     return res
       .status(200)
       .json({

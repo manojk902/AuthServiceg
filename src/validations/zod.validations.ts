@@ -18,7 +18,7 @@ export const loginValidationSchema = z.object({
 
 // ----------------------------------------------RECOVERY EMAIL VALIDATION
 export const recoveryEmailValidationSchema = z.object({
-    id: z.coerce.string().min(1,{message: "User ID is required"}),
+    id: z.coerce.number().min(1,{message: "User ID is required"}),
     recoveryEmail: z.string().email({ message: "Invalid email format" })
 })
 
@@ -35,17 +35,17 @@ export const resetPasswordValidationSchema = z.object({
 
 // ----------------------------------------------USER ID VALIDATION
 export const userIdValidationSchema = z.object({
-  id: z.coerce.string().min(1, { message: "User ID is required" }),
+  id: z.coerce.number().min(1, { message: "User ID is required" }),
 });
 
 //-----------------------------------------------DEACTIVATE ACCOUNT VALIDATION
 export const deactivateAccountValidationSchema = z.object({
-  id: z.coerce.string().min(1, { message: "User ID is required" }),
+  id: z.coerce.number().min(1, { message: "User ID is required" }),
   deactivateReason: z.string().min(1, { message: "Deactivation reason is required" }),
 });
 
 // -----------------------------------------------SUSPEND ACCOUNT VALIDATION
 export const suspendAccountValidationSchema = z.object({
-  id: z.coerce.string().min(1, { message: "User ID is required" }),
+  id: z.coerce.number().min(1, { message: "User ID is required" }),
   suspendReason: z.string().min(1, { message: "Suspend reason is required" }),
 });

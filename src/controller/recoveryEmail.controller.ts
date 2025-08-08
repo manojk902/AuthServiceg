@@ -8,15 +8,8 @@ export const recoveryUserEmail = async (req:Request, res:Response)=>{
   try {
     const validatedData = recoveryEmailValidationSchema.parse(req.body);
     const { id, recoveryEmail } = validatedData;
-    const userId = parseInt(id);
     
-    if (!userId || !recoveryEmail) {
-      return res
-        .status(400)
-        .json({ status: "error", message: "User ID and recovery email are required" });
-    }
-
-    await recoveryEmailService(userId, recoveryEmail);
+    await recoveryEmailService(id, recoveryEmail);
     
     return res
       .status(200)
