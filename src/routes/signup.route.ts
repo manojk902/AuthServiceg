@@ -1,5 +1,6 @@
 import { Request, Response, Router } from "express";
-import { signup, verifyEmail } from "../controller/signup.controller";
+import { getUserByIdController, signup, verifyEmail } from "../controller/signup.controller";
+import { get } from "http";
 
 const router = Router();
 
@@ -188,4 +189,67 @@ router.get("/verify-email", (req: Request, res: Response) => {
   verifyEmail(req, res);
 });
 
+
+/**
+ * @swagger
+ * /get-user/{id}:
+ *   get:
+ *     summary: Get user details by ID
+ *     description: Fetches a user's details using their unique ID.
+ *     tags:
+ *       - Users
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: The unique ID of the user.
+ *         example: 123
+ *     responses:
+ *       200:
+ *         description: User details fetched successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: success
+ *                 message:
+ *                   type: string
+ *                   example: User details fetched successfully
+ *                 user:
+ *                   type: object
+ *                   properties:
+ *                     username:
+ *                       type: string
+ *                       example: mukesh123
+ *                     firstName:
+ *                       type: string
+ *                       example: Mukesh
+ *                     lastName:
+ *                       type: string
+ *                       example: Kumar
+ *                     email:
+ *                       type: string
+ *                       example: mukesh@example.com
+ *                     recoveryEmail:
+ *                       type: string
+ *                       example: mukesh.recovery@example.com
+ *                     phoneNumber:
+ *                       type: string
+ *                       example: "+911234567890"
+ *       400:
+ *         description: Invalid user ID
+ *       404:
+ *         description: User not found
+ *       500:
+ *         description: Internal server error
+ */
+
+router.get('/get-user/:id',(req:Request, res:Response)=>{
+  getUserByIdController(req, res);
+})
 export default router;

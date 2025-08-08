@@ -7,9 +7,9 @@ import signupRoute from './routes/signup.route'
 import loginRoute from './routes/login.route'
 import forgotPasswordRoute from './routes/forgotPassword.route'
 import resetPasswordRoute from './routes/forgotPassword.route'
-import deactivateUserAccountRoute from './routes/accountDeactivate.route'
+import accountDeactivateRoute from './routes/accountDeactivate.route'
 import reactivateUserAccountRoute from './routes/accountDeactivate.route'
-import deleteAccountService from './routes/deleteAccount.route';
+import deleteAccountRoute from './routes/deleteAccount.route';
 import recoverAccountRoute from './routes/deleteAccount.route';
 import suspendAccountRoute from './routes/suspendAccount.route'
 import unsuspendAccountRoute from './routes/suspendAccount.route'
@@ -47,19 +47,19 @@ app.use("/api/v1/auth", loginRoute)
 
 // forgot password route----------------------------------------------------------FORGOT PASSWORD '/api/v1/auth/forgotpsd'
 app.use('/api/v1/auth',forgotPasswordRoute)
-app.use('/api/v1/auth',resetPasswordRoute)
+// app.use('/api/v1/auth',resetPasswordRoute)
 
 // deactivate account route----------------------------------------------------DEACTIVATE ACCOUNT '/api/v1/auth/deactivate-account'
-app.use('/api/v1/auth',deactivateUserAccountRoute)
-app.use('/api/v1/auth',reactivateUserAccountRoute)
+app.use('/api/v1/auth',accountDeactivateRoute)
+// app.use('/api/v1/auth',reactivateUserAccountRoute)
 
 // delete account route----------------------------------------------------DELETE ACCOUNT '/api/v1/auth/delete-account'
-app.use('/api/v1/auth',deleteAccountService)
-app.use('/api/v1/auth',recoverAccountRoute)
+app.use('/api/v1/auth',deleteAccountRoute)
+// app.use('/api/v1/auth',recoverAccountRoute)
 
 // suspend account route----------------------------------------------------SUSPEND ACCOUNT '/api/v1/auth/suspend-account'
 app.use('/api/v1/auth',suspendAccountRoute)
-app.use('/api/v1/auth',unsuspendAccountRoute)
+// app.use('/api/v1/auth',unsuspendAccountRoute)
 
 // recovery Email route----------------------------------------------------RECOVERY EMAIL '/api/v1/auth/recovery-email'
 app.use('/api/v1/auth', recoveryEmailRoute)

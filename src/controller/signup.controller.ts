@@ -1,16 +1,16 @@
-import { signupUser } from "../service/signup.service";
+import { getUserById, signupUser } from "../service/signup.service";
 import { Request, Response } from "express";
 import crypto from "crypto";
 import pool from "../config/pgDatabase/dbConnect";
 import transporter from "../utils/transporter";
-import { signupValidationSchema } from "../validations/zod.validations";
+import { signupValidationSchema, userIdValidationSchema } from "../validations/zod.validations";
 import z from "zod";
 
 // ------------------------------------------------------------------------USER SIGNUP CONTROLLER
 export const signup = async (req: Request, res: Response) => {
   try {
     const validatedData = signupValidationSchema.parse(req.body);
-    const { firstName, lastName, email, password, appName  } = validatedData;
+    const { firstName, lastName, email, password, appName } = validatedData;
 
     const result = await pool.query(`SELECT * FROM users WHERE email = $1`, [email]);
     const existingUser = result.rows[0];
@@ -40,12 +40,12 @@ export const signup = async (req: Request, res: Response) => {
       }
 
       //  User is verified → proceed to insert into user_app if needed
-      const resUser = await signupUser(firstName, lastName, email, password, appName );
+      const resUser = await signupUser(firstName, lastName, email, password, appName);
 
       return res.status(200).json({
         status: "user_exists",
         message: "User already exists, new app access granted.",
-        user:{
+        user: {
           id: resUser.id,
           email: resUser.email,
           username: resUser.username,
@@ -57,7 +57,7 @@ export const signup = async (req: Request, res: Response) => {
     }
 
     //  Brand new user
-    await signupUser(firstName, lastName, email, password, appName );
+    await signupUser(firstName, lastName, email, password, appName);
     return res.status(201).json({
       status: "success",
       message: "Signup successful! Please check your email to verify your account.",
@@ -68,7 +68,7 @@ export const signup = async (req: Request, res: Response) => {
       return res.status(400).json({
         status: "error",
         message: "Validation failed",
-        errors: error.issues 
+        errors: error.issues
       });
     }
 
@@ -98,3 +98,50 @@ export const verifyEmail = async (req: Request, res: Response) => {
   //  Redirect to UI with success and user ID
   return res.redirect(`${process.env.UI_URL}/login?status=activation-success&id=${user.id}`);
 };
+
+// ------------------------------------------------------------------------GET USER BY ID CONTROLLER
+export const getUserByIdController = async (req: Request, res: Response) => {
+  try {
+    const validatedData = userIdValidationSchema.parse(req.params);
+    const { id } = validatedData;
+    const userId = parseInt(id);
+    if (isNaN(userId)) {
+      return res.status(400).json({
+        status: "error",
+        message: "Invalid user ID"
+      });
+    }
+    const user = await getUserById(userId);
+    if (!user) {
+      return res.status(404).json({
+        status: "user_not_found",
+        message: "User not found"
+      });
+    }
+    return res.status(200).json({
+      status: "success",
+      message: "User details fetched successfully",
+      user: {
+        username: user.username,
+        firstName: user.first_name,
+        lastName: user.last_name,
+        email: user.email,
+        recoveryEmail: user.recovery_email,
+        phoneNumber: user.phone_number
+      }
+    });
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      return res.status(400).json({
+        status: "error",
+        message: "Validation failed",
+        errors: error.issues
+      });
+    }
+    console.error("Error fetching user by ID:", error);
+    return res.status(500).json({
+      status: "error",
+      message: "Internal server error"
+    });
+  }
+}
