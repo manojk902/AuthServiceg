@@ -1,5 +1,5 @@
 import { Request, Response, Router } from "express";
-import { getUserByIdController, signup, verifyEmail } from "../controller/signup.controller";
+import { getUserByIdController, signup, updateUserById, verifyEmail } from "../controller/signup.controller";
 import { get } from "http";
 
 const router = Router();
@@ -252,4 +252,111 @@ router.get("/verify-email", (req: Request, res: Response) => {
 router.get('/get-user/:id',(req:Request, res:Response)=>{
   getUserByIdController(req, res);
 })
+
+
+/**
+ * @swagger
+ * /update-user:
+ *   put:
+ *     summary: Update user details by ID
+ *     description: Updates the details of an existing user in the system.
+ *     tags:
+ *       - Users
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               id:
+ *                 type: integer
+ *                 example: 1
+ *                 description: User ID (required)
+ *               first_name:
+ *                 type: string
+ *                 example: John
+ *                 description: First name of the user (required)
+ *               last_name:
+ *                 type: string
+ *                 example: Doe
+ *                 description: Last name of the user (optional)
+ *               email:
+ *                 type: string
+ *                 example: john@example.com
+ *                 description: Email address (required, must be valid)
+ *               recovery_email:
+ *                 type: string
+ *                 example: john.recovery@example.com
+ *                 description: Recovery email address (optional, must be valid)
+ *               phone_number:
+ *                 type: string
+ *                 example: 9876543210
+ *                 description: Phone number (optional, must start with 6-9 and be exactly 10 digits)
+ *             required:
+ *               - id
+ *               - first_name
+ *               - email
+ *     responses:
+ *       200:
+ *         description: User details updated successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: success
+ *                 message:
+ *                   type: string
+ *                   example: User details updated successfully
+ *                 user:
+ *                   type: object
+ *                   properties:
+ *                     id:
+ *                       type: integer
+ *                       example: 1
+ *                     firstName:
+ *                       type: string
+ *                       example: John
+ *                     lastName:
+ *                       type: string
+ *                       example: Doe
+ *                     email:
+ *                       type: string
+ *                       example: john@example.com
+ *                     recoveryEmail:
+ *                       type: string
+ *                       example: john.recovery@example.com
+ *                     phoneNumber:
+ *                       type: string
+ *                       example: 9876543210
+ *       400:
+ *         description: Validation failed
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: error
+ *                 message:
+ *                   type: string
+ *                   example: Validation failed
+ *                 errors:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *       404:
+ *         description: User not found
+ *       500:
+ *         description: Internal server error
+ */
+
+router.put('/update-user',(req:Request, res:Response)=>{
+  updateUserById(req, res);
+})
+
 export default router;

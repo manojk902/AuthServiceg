@@ -79,3 +79,13 @@ export const getUserById = async (id: number)=>{
   const query = await pool.query(`SELECT username, first_name, last_name, email, recovery_email, phone_number FROM users WHERE id = $1 AND is_deleted=$2`, [id,'false']);
   return query.rows[0];
 }
+
+// ----------------------------------------UPDATE USER BY ID
+export const updateUserbyId = async (id:number, updateUser: Partial<any>)=>{
+  const { first_name, last_name, email, recovery_email, phone_number } = updateUser;
+  const query = await pool.query(
+    `UPDATE users SET first_name = $1, last_name = $2, email = $3, recovery_email = $4, phone_number = $5 WHERE id = $6 RETURNING *`,
+    [first_name, last_name, email, recovery_email, phone_number, id]
+  );
+  return query.rows[0];
+}

@@ -1,9 +1,9 @@
-import { getUserById, signupUser } from "../service/signup.service";
+import { getUserById, signupUser, updateUserbyId } from "../service/signup.service";
 import { Request, Response } from "express";
 import crypto from "crypto";
 import pool from "../config/pgDatabase/dbConnect";
 import transporter from "../utils/transporter";
-import { signupValidationSchema, userIdValidationSchema } from "../validations/zod.validations";
+import { signupValidationSchema, updateUserValidationSchema, userIdValidationSchema } from "../validations/zod.validations";
 import z from "zod";
 
 // ------------------------------------------------------------------------USER SIGNUP CONTROLLER
@@ -133,6 +133,50 @@ export const getUserByIdController = async (req: Request, res: Response) => {
       });
     }
     console.error("Error fetching user by ID:", error);
+    return res.status(500).json({
+      status: "error",
+      message: "Internal server error"
+    });
+  }
+}
+
+
+// ------------------------------------------------------------------------UPDATE USER BY ID CONTROLLER
+export const updateUserById = async (req: Request, res:Response)=>{
+  try {
+    const validatedData = updateUserValidationSchema.parse(req.body);
+    const { id, first_name, last_name, email, recovery_email, phone_number } = validatedData;
+
+    const updatedUser = await updateUserbyId(id,{first_name, last_name, email, recovery_email, phone_number});
+    if (!updatedUser) {
+      return res.status(404).json({
+        status: "user_not_found",
+        message: "User not found"
+      });
+    }
+
+    return res.status(200).json({
+      status: "success",
+      message: "User details updated successfully",
+      user: {
+        id: updatedUser.id,
+        firstName: updatedUser.first_name,
+        lastName: updatedUser.last_name,
+        email: updatedUser.email,
+        recoveryEmail: updatedUser.recovery_email,
+        phoneNumber: updatedUser.phone_number
+      }
+    });
+
+  } catch (error) {
+    if(error instanceof z.ZodError){
+      return res.status(400).json({
+        status: "error",
+        message: "Validation failed",
+        errors: error.issues
+      });
+    }
+    console.error("Error updating user by ID:", error);
     return res.status(500).json({
       status: "error",
       message: "Internal server error"
