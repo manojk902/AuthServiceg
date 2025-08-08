@@ -49,13 +49,26 @@ export const signupUser = async (
   // Step 4: Insert into user_app if not already exists
   const userAppExists = await pool.query(
     `SELECT * FROM user_app WHERE user_id = $1 AND app_name = $2`,
-    [user.id, appName, ]
+    [user.id, appName ]
   );
 
   if (userAppExists.rows.length === 0) {
     await pool.query(
       `INSERT INTO user_app (user_id, app_name) VALUES ($1, $2)`,
       [user.id, appName ]
+    );
+  }
+
+  // Step 4: Insert into user_info if not already exists
+  const userInfoExists = await pool.query(
+    `SELECT * FROM user_info WHERE user_id = $1`,
+    [user.id ]
+  );
+
+  if (userInfoExists.rows.length === 0) {
+    await pool.query(
+      `INSERT INTO user_info (user_id) VALUES ($1)`,
+      [user.id ]
     );
   }
 
