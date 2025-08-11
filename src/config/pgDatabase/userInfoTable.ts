@@ -5,7 +5,7 @@ const userInfoTable = async () => {
     id SERIAL PRIMARY KEY,
     user_id INT NOT NULL,
     user_photo VARCHAR(255),
-    dob VARCHAR(255) ,
+    dob DATE ,
     gender VARCHAR(50),
     home_address VARCHAR(255),
     work_address VARCHAR(255),
