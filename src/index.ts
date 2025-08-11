@@ -12,6 +12,7 @@ import suspendAccountRoute from './routes/suspendAccount.route'
 import recoveryEmailRoute from './routes/recoveryEmail.route';
 import userInfoRoute from './routes/userInfo.route';
 import { swaggerSpec, swaggerUi } from './swagger';
+import path from 'path';
 
 dotenv.config(); // Load environment variables
 
@@ -30,6 +31,8 @@ const BASE_URL_SERVER = process.env.BASE_URL_SERVER ;
 
 // Swagger route---------------------------------------------------SWAGGER ROUTE "/api/v1/auth/docs"
 app.use('/api/v1/auth/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+// -------------------------------------------------------------------------------UPLOAD
+app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
 // default route------------------------------------------------------------------DEFAULT ROUTE "/"
 app.use('/',defaultRoute)
 

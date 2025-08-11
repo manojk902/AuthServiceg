@@ -66,7 +66,6 @@ export const updateUserValidationSchema = z.object({
 // -----------------------------------------------UPDATE USER INFO VALIDATION
 export const updateUserInfoValidationSchema = z.object({
   id: z.coerce.number().min(1, { message: "User ID is required" }),
-  user_photo: z.string().optional(),
   dob: z.coerce.date().optional(),
   gender: z.enum(["Male","Female","Other"]).optional(),
   home_address: z.string().optional(),
