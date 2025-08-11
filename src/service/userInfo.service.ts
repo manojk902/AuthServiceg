@@ -12,3 +12,15 @@ export const getUserInfoById = async (id:number)=>{
     const query = await pool.query(`SELECT user_Photo, TO_CHAR(dob, 'DD/MM/YYYY') AS dob, gender, home_address, work_address FROM user_info WHERE user_id = $1`,[id])
     return query.rows[0];
 }
+
+// ----------------------------------------------------UPDATE USER PHOTO SERVICE
+export const updateUserPhotoById = async (id:number, updateUserPhoto: string)=>{
+    const query = await pool.query(`UPDATE user_info SET user_photo = $1 WHERE user_id = $2 RETURNING *`, [updateUserPhoto, id]);
+    return query.rows[0];
+}
+
+// ----------------------------------------------------GET USER PHOTO BY ID SERVICE
+export const getUserPhotoById = async (id:number)=>{
+    const query = await pool.query(`SELECT user_Photo FROM user_info WHERE user_id = $1`,[id])
+    return query.rows[0];
+}

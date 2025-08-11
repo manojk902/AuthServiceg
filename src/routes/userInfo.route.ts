@@ -1,7 +1,8 @@
 import { Request, Response } from "express";    
-import { updateUserInfoController } from "../controller/userInfo.controller";   
+import { getUserPhotoByIdController, updateUserInfoController, updateUserPhotoController } from "../controller/userInfo.controller";   
 import { Router } from "express";
 import {getUserInfoByIdController} from "../controller/userInfo.controller";
+import { upload } from "../utils/multer";
 const router = Router();
 
 /**
@@ -124,7 +125,7 @@ const router = Router();
  *         description: Internal server error
  */
 
-router.put('/update-user-info', (req:Request, res:Response)=>{
+router.put('/update-user-info', upload.single("user_photo"), (req:Request, res:Response)=>{
     updateUserInfoController(req, res);
 });
 
@@ -241,5 +242,104 @@ router.put('/update-user-info', (req:Request, res:Response)=>{
 router.get('/get-user-info/:id', (req:Request, res:Response)=>{
     getUserInfoByIdController(req, res);
 });
+
+
+/**
+ * @swagger
+ * /update-user-photo:
+ *   put:
+ *     summary: Update a user's profile photo
+ *     description: Upload a new profile photo for the specified user.
+ *     tags:
+ *       - Users
+ *     consumes:
+ *       - multipart/form-data
+ *     parameters:
+ *       - in: formData
+ *         name: id
+ *         type: integer
+ *         required: true
+ *         description: ID of the user whose photo will be updated.
+ *       - in: formData
+ *         name: user_photo
+ *         type: file
+ *         required: true
+ *         description: The image file to upload as the user photo.
+ *     responses:
+ *       200:
+ *         description: User photo updated successfully
+ *         schema:
+ *           type: object
+ *           properties:
+ *             status:
+ *               type: string
+ *               example: success
+ *             message:
+ *               type: string
+ *               example: User Photo updated successfully
+ *             userPhoto:
+ *               type: string
+ *               example: http://localhost:2000/uploads/1754908397358-demo_user2.png
+ *       400:
+ *         description: Validation failed or user not found
+ *       500:
+ *         description: Internal server error
+ */
+
+router.put('/update-user-photo', upload.single("user_photo"),(req:Request, res:Response)=>{
+    updateUserPhotoController(req, res);
+})
+
+
+/**
+ * @swagger
+ * /get-user-photo/{id}:
+ *   get:
+ *     summary: Get user photo by user ID
+ *     tags: [User]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: The ID of the user whose photo you want to retrieve
+ *     responses:
+ *       200:
+ *         description: User photo fetched successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: success
+ *                 message:
+ *                   type: string
+ *                   example: User Photo fetched successfully
+ *                 userPhoto:
+ *                   type: string
+ *                   example: http://192.168.0.3:2000/uploads/1754908397358-demo_user2.png
+ *       400:
+ *         description: User not found or validation failed
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: error
+ *                 message:
+ *                   type: string
+ *                   example: UserPhoto not found
+ *       500:
+ *         description: Internal server error
+ */
+
+router.get('/get-user-photo/:id',(req:Request, res:Response)=>{
+    getUserPhotoByIdController(req, res)
+})
 
 export default router;
