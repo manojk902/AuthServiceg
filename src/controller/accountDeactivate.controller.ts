@@ -12,13 +12,12 @@ export const deactivateUserAccount = async (req: Request, res: Response) => {
   try {
     const validatedData = deactivateAccountValidationSchema.parse(req.body) ;
     const { id, deactivateReason } = validatedData;
-    const userId = parseInt(id);
-    if (!userId || !deactivateReason) {
-      return res
-        .status(401)
-        .json({ status: "error", message: "All fields are required" });
-    }
-    const user = await findUserByIdService(userId);
+    // if (!userId || !deactivateReason) {
+    //   return res
+    //     .status(401)
+    //     .json({ status: "error", message: "All fields are required" });
+    // }
+    const user = await findUserByIdService(id);
     if (!user) {
       return res
         .status(400)
@@ -33,7 +32,7 @@ export const deactivateUserAccount = async (req: Request, res: Response) => {
           message: "User account is already deactivated",
         });
     }
-    await deactivateAccount(userId, deactivateReason);
+    await deactivateAccount(id, deactivateReason);
     return res
       .status(200)
       .json({
@@ -61,9 +60,8 @@ export const reactivateUserAccount = async (req: Request, res: Response) => {
   try {
     const validatedData = userIdValidationSchema.parse(req.body) ;
     const { id } = validatedData;
-    const userId = parseInt(id);
    
-    const user = await findUserByIdService(userId);
+    const user = await findUserByIdService(id);
     if (!user) {
       return res
         .status(400)
@@ -78,7 +76,7 @@ export const reactivateUserAccount = async (req: Request, res: Response) => {
           message: "User account is already active",
         });
     }
-    await reactivateAccount(userId);
+    await reactivateAccount(id);
     return res
       .status(200)
       .json({
