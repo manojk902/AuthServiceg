@@ -10,7 +10,7 @@ export const signupUser = async (
   lastName: string,
   email: string,
   password: string,
-  appName: string,
+  appName?: string,
 ) => {
   const emailLower = email.toLowerCase();
 
