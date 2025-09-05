@@ -5,7 +5,7 @@ import { id } from 'zod/v4/locales/index.cjs';
 export const signupValidationSchema = z.object({
   firstName: z.string().min(1, { message: "First name is required" }),
   lastName: z.string().min(1, { message: "Last name is required" }),
-  appName: z.string().optional(),
+  appName: z.coerce.string().optional(),
   email: z.string().min(1, { message: "email is required" }).email({ message: "Invalid email format" }),
   password: z.string().min(8, { message: "Password must be at least 8 characters long" }),
 });
