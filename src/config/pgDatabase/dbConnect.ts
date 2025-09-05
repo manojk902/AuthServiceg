@@ -2,6 +2,7 @@ import { Pool } from "pg";
 import dotenv from "dotenv";
 import userTable from "./usersTable";
 import userAppTable from "./userAppTable";
+import userInfoTable from "./userInfoTable";
 dotenv.config();
 
 // create a new pool instance for local Postgres database connection
@@ -27,6 +28,7 @@ pool
     console.log("Connected to Render Postgres DB Successfully!");
     userTable();
     userAppTable();
+    userInfoTable();
   })
   .catch((error) => {
     console.error("Unexpected error on idle client", error);

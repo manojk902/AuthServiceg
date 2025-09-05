@@ -4,58 +4,17 @@ import pool from "../config/pgDatabase/dbConnect";
 
 import transporter from "../utils/transporter";
 
-// export const signupUser = async (
-//   firstName: string,
-//   lastName: string,
-//   email: string,
-//   password: string,  
-//   app_name: string
-// ) => {
-//   // unique username
-//   // const randonSuffix = crypto.randomBytes(32).toString("hex");
-//   const randonSuffix = Math.floor(100 + Math.random() * 900);
-//   let uniqueUsername = `${firstName.toLowerCase()}_${randonSuffix}`;
-//   // hashed password
-//   const hashedPassword = await bcrypt.hash(password, 0);
-
-//   // generate random varification token
-//   const varificationToken = crypto.randomBytes(32).toString("hex");
-
-//   // insert user with is_varified = false
-//   const query = `INSERT INTO users (username,first_name, last_name, email, password, verification_token) VALUES ($1, $2, $3, $4, $5, $6) RETURNING * `;
-//   const values = [
-//     uniqueUsername,
-//     firstName,
-//     lastName,
-//     email.toLowerCase(),
-//     hashedPassword,
-//     varificationToken,
-//   ];
-//   const { rows } = await pool.query(query, values);
-//   const user = rows[0];
-
-//   // insert user app
-//   const userAppQuery = `INSERT INTO user_app (user_id, app_name) VALUES ($1, $2)`;
-//   const userAppQueryValues = [user.id, app_name];
-//   await pool.query(userAppQuery, userAppQueryValues);
-
-
-//   // send verification mail
-//   const verificationUrl = `${process.env.BASE_URL_SERVER}/api/v1/auth/verify-email?emailVerifyToken=${varificationToken}`;
-//   await sendVerificationEmail(user.email, verificationUrl);
-//   return user;
-// };
-
+// ------------------------------------------------------------------USER SIGNUP SERVICE
 export const signupUser = async (
   firstName: string,
   lastName: string,
   email: string,
   password: string,
-  appName: string,
+  appName?: string,
 ) => {
   const emailLower = email.toLowerCase();
 
-  // 🔍 Step 1: Check if user exists
+  // Step 1: Check if user exists
   const existingUserResult = await pool.query(`SELECT * FROM users WHERE email = $1`, [emailLower]);
   let user;
   let isNewUser = false;
@@ -63,15 +22,15 @@ export const signupUser = async (
   if (existingUserResult.rows.length > 0) {
     user = existingUserResult.rows[0];
   } else {
-    // 🔒 Step 2: Hash password
+    // Step 2: Hash password
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // 🔑 Generate username and verification token
+    // Generate username and verification token
     const randomSuffix = Math.floor(100 + Math.random() * 900);
     const uniqueUsername = `${firstName.toLowerCase()}_${randomSuffix}`;
     const verificationToken = crypto.randomBytes(32).toString("hex");
 
-    // 🆕 Step 3: Insert into users table
+    // Step 3: Insert into users table
     const insertUserQuery = `
       INSERT INTO users (username, first_name, last_name, email, password, verification_token)
       VALUES ($1, $2, $3, $4, $5, $6) RETURNING *
@@ -81,16 +40,16 @@ export const signupUser = async (
     user = rows[0];
     isNewUser = true;
 
-    // ✉️ Send verification email only for new users
+    //  Send verification email only for new users
     console.log(`server url -> ${process.env.BASE_URL_SERVER}`)
     const verificationUrl = `${process.env.BASE_URL_SERVER}/api/v1/auth/verify-email?emailVerifyToken=${verificationToken}`;
     await sendVerificationEmail(user.email, verificationUrl);
   }
 
-  // ✅ Step 4: Insert into user_app if not already exists
+  // Step 4: Insert into user_app if not already exists
   const userAppExists = await pool.query(
     `SELECT * FROM user_app WHERE user_id = $1 AND app_name = $2`,
-    [user.id, appName, ]
+    [user.id, appName ]
   );
 
   if (userAppExists.rows.length === 0) {
@@ -100,10 +59,23 @@ export const signupUser = async (
     );
   }
 
+  // Step 4: Insert into user_info if not already exists
+  const userInfoExists = await pool.query(
+    `SELECT * FROM user_info WHERE user_id = $1`,
+    [user.id ]
+  );
+
+  if (userInfoExists.rows.length === 0) {
+    await pool.query(
+      `INSERT INTO user_info (user_id) VALUES ($1)`,
+      [user.id ]
+    );
+  }
+
   return user;
 };
 
-
+// ----------------------------------------SEND VERIFICATION EMAIL
 const sendVerificationEmail = async (to: string, url: string) => {
   transporter;
 
@@ -114,3 +86,19 @@ const sendVerificationEmail = async (to: string, url: string) => {
     html: `<p>Please verify your email by clicking <a href="${url}" > Click to Verify </a>   </p>`,
   });
 };
+
+// ----------------------------------------GET USER BY ID
+export const getUserById = async (id: number)=>{
+  const query = await pool.query(`SELECT username, first_name, last_name, email, recovery_email, phone_number FROM users WHERE id = $1 AND is_deleted=$2`, [id,'false']);
+  return query.rows[0];
+}
+
+// ----------------------------------------UPDATE USER BY ID
+export const updateUserbyId = async (id:number, updateUser: Partial<any>)=>{
+  const { first_name, last_name, email, recovery_email, phone_number } = updateUser;
+  const query = await pool.query(
+    `UPDATE users SET first_name = $1, last_name = $2, email = $3, recovery_email = $4, phone_number = $5 WHERE id = $6 RETURNING *`,
+    [first_name, last_name, email, recovery_email, phone_number, id]
+  );
+  return query.rows[0];
+}

@@ -15,7 +15,7 @@ export const handleForgotPassword = async (email: string, useRecoveryEmail:false
   if (!user) throw new Error("User not found");
 
   const token = crypto.randomBytes(32).toString("hex");
-  const expiry = new Date(Date.now() + 1000 * 60 * 15); //15 min
+  const expiry = new Date(Date.now() + 1000 * 60 * 15); // 15 min
   console.log("token forgot",token)
 
 
@@ -24,7 +24,7 @@ export const handleForgotPassword = async (email: string, useRecoveryEmail:false
     [token, expiry, email]
   );
 
-  const resetLink = `${process.env.UI_URL}/reset-password?resetPasswordToken=${token}`; // chage this to front end url
+  const resetLink = `${process.env.UI_URL}/reset-password?resetPasswordToken=${token}`; 
   await transporter.sendMail({
     from: `"Drive OSx" <${process.env.SMTP_EMAIL}>`,
     to: useRecoveryEmail ? user.recovery_email : user.email,

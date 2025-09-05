@@ -6,17 +6,13 @@ import defaultRoute from './routes/default.route'
 import signupRoute from './routes/signup.route'
 import loginRoute from './routes/login.route'
 import forgotPasswordRoute from './routes/forgotPassword.route'
-import resetPasswordRoute from './routes/forgotPassword.route'
-import deactivateUserAccountRoute from './routes/accountDeactivate.route'
-import reactivateUserAccountRoute from './routes/accountDeactivate.route'
-import deleteAccountService from './routes/deleteAccount.route';
-import recoverAccountRoute from './routes/deleteAccount.route';
+import accountDeactivateRoute from './routes/accountDeactivate.route'
+import deleteAccountRoute from './routes/deleteAccount.route';
 import suspendAccountRoute from './routes/suspendAccount.route'
-import unsuspendAccountRoute from './routes/suspendAccount.route'
 import recoveryEmailRoute from './routes/recoveryEmail.route';
-import pool from './config/pgDatabase/dbConnect'; // Import the database pool
+import userInfoRoute from './routes/userInfo.route';
 import { swaggerSpec, swaggerUi } from './swagger';
-import swaggerJSDoc from 'swagger-jsdoc';
+import path from 'path';
 
 dotenv.config(); // Load environment variables
 
@@ -35,34 +31,39 @@ const BASE_URL_SERVER = process.env.BASE_URL_SERVER ;
 
 // Swagger route---------------------------------------------------SWAGGER ROUTE "/api/v1/auth/docs"
 app.use('/api/v1/auth/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+// -------------------------------------------------------------------------------UPLOAD
+app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
 // default route------------------------------------------------------------------DEFAULT ROUTE "/"
 app.use('/',defaultRoute)
 
-// signup root -------------------------------------------------------------------SIGNUP ROUTE "/api/v1/auth/signup"
+// signup root -------------------------------------------------------------------SIGNUP ROUTE 
 app.use("/api/v1/auth",signupRoute)
 // signup(app, pool)
 
-// login route--------------------------------------------------------------------LOGIN ROUTE "/api/v1/auth/signup"
+// login route--------------------------------------------------------------------LOGIN ROUTE 
 app.use("/api/v1/auth", loginRoute)
 
-// forgot password route----------------------------------------------------------FORGOT PASSWORD '/api/v1/auth/forgotpsd'
+// forgot password route----------------------------------------------------------FORGOT PASSWORD 
 app.use('/api/v1/auth',forgotPasswordRoute)
-app.use('/api/v1/auth',resetPasswordRoute)
+// app.use('/api/v1/auth',resetPasswordRoute)
 
-// deactivate account route----------------------------------------------------DEACTIVATE ACCOUNT '/api/v1/auth/deactivate-account'
-app.use('/api/v1/auth',deactivateUserAccountRoute)
-app.use('/api/v1/auth',reactivateUserAccountRoute)
+// deactivate account route----------------------------------------------------DEACTIVATE ACCOUNT 
+app.use('/api/v1/auth',accountDeactivateRoute)
+// app.use('/api/v1/auth',reactivateUserAccountRoute)
 
-// delete account route----------------------------------------------------DELETE ACCOUNT '/api/v1/auth/delete-account'
-app.use('/api/v1/auth',deleteAccountService)
-app.use('/api/v1/auth',recoverAccountRoute)
+// delete account route----------------------------------------------------DELETE ACCOUNT 
+app.use('/api/v1/auth',deleteAccountRoute)
+// app.use('/api/v1/auth',recoverAccountRoute)
 
-// suspend account route----------------------------------------------------SUSPEND ACCOUNT '/api/v1/auth/suspend-account'
+// suspend account route----------------------------------------------------SUSPEND ACCOUNT 
 app.use('/api/v1/auth',suspendAccountRoute)
-app.use('/api/v1/auth',unsuspendAccountRoute)
+// app.use('/api/v1/auth',unsuspendAccountRoute)
 
-// recovery Email route----------------------------------------------------RECOVERY EMAIL '/api/v1/auth/recovery-email'
+// recovery Email route----------------------------------------------------RECOVERY EMAIL 
 app.use('/api/v1/auth', recoveryEmailRoute)
+
+// user info route----------------------------------------------------USER INFO 
+app.use('/api/v1/auth', userInfoRoute)
 
 
 server.listen(PORT, () => {

@@ -4,7 +4,7 @@ const userAppTable = async () => {
     const userAppTableQuery = `CREATE TABLE IF NOT EXISTS user_app(
     id SERIAL PRIMARY KEY,
     user_id INT NOT NULL,
-    app_name VARCHAR(100) NOT NULL,
+    app_name VARCHAR(100),
     created_at TIMESTAMP NOT NULL DEFAULT NOW(),
 
     UNIQUE (user_id, app_name),

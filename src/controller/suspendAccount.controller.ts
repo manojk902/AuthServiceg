@@ -1,19 +1,15 @@
 import { suspendAccountService, reactivateSuspendedAccountService } from "../service/suspendAccount.service";
 import { Request, Response } from "express";
+import { suspendAccountValidationSchema, userIdValidationSchema } from "../validations/zod.validations";
+import z from "zod";
 
 // suspend user account
 export const suspendUserAccount = async (req: Request, res: Response) => {
-  const { id, suspendReason } = req.body;
-  const userId = parseInt(id);
-
-  if (!userId || !suspendReason) {
-    return res
-      .status(400)
-      .json({ status: "error", message: "User ID and suspendReason are required" });
-  }
+  const validatedData = suspendAccountValidationSchema.parse(req.body) ;
+  const { id, suspendReason } = validatedData;
 
   try {
-    await suspendAccountService(userId, suspendReason);
+    await suspendAccountService(id, suspendReason);
     return res
       .status(200)
       .json({
@@ -21,6 +17,13 @@ export const suspendUserAccount = async (req: Request, res: Response) => {
         message: "User account suspended successfully",
       });
   } catch (error) {
+    if (error instanceof z.ZodError) {
+      return res.status(400).json({
+        status: "error",
+        message: "Validation failed",
+        errors: error.issues 
+      });
+    }
     console.error(error);
     return res
       .status(500)
@@ -30,17 +33,11 @@ export const suspendUserAccount = async (req: Request, res: Response) => {
 
 // reactivate suspended user account
 export const reactivateSuspendedUserAccount = async (req: Request, res: Response) => {
-  const { id } = req.body;
-  const userId = parseInt(id);
-
-  if (!userId) {
-    return res
-      .status(400)
-      .json({ status: "error", message: "User ID is required" });
-  }
+  const validatedData = userIdValidationSchema.parse(req.body) ;
+  const { id } = validatedData;
 
   try {
-    await reactivateSuspendedAccountService(userId);
+    await reactivateSuspendedAccountService(id);
     return res
       .status(200)
       .json({
@@ -48,7 +45,14 @@ export const reactivateSuspendedUserAccount = async (req: Request, res: Response
         message: "User account reactivated successfully",
       });
   } catch (error) {
-    console.error(error);
+    if (error instanceof z.ZodError) {
+      return res.status(400).json({
+        status: "error",
+        message: "Validation failed",
+        errors: error.issues 
+      });
+    }
+    console.error("Reactivation error:", error);
     return res
       .status(500)
       .json({ status: "error", message: "Internal server error" });
