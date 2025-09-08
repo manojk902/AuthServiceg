@@ -2,13 +2,15 @@ import { Request, Response } from "express";
 import { updateUserInfoValidationSchema, userIdValidationSchema } from "../validations/zod.validations";
 import z from "zod";
 import { getUserInfoById, getUserPhotoById, updateUserInfoById, updateUserPhotoById } from "../service/userInfo.service";
+import { uploadToCloudinary } from "../utils/cloudinaryUpload";
 
 // -----------------------------------------UPDATE USER INFO
 export const updateUserInfoController = async (req: Request, res: Response) => {
     try {
         let userPhotoPath = null;
         if(req.file){
-            userPhotoPath = `${process.env.BASE_URL_SERVER}/uploads/${req.file.filename}`;
+            const cloudinaryResult = await uploadToCloudinary(req.file.buffer, "auth_user_Photos")
+            userPhotoPath = cloudinaryResult.secure_url;
         }
         const validatedData = updateUserInfoValidationSchema.parse({...req.body, user_photo :userPhotoPath});
         const { id, dob, gender, home_address, work_address } = validatedData;
@@ -75,7 +77,8 @@ export const updateUserPhotoController = async (req: Request, res: Response) => 
     try {
         let userPhotoPath = "" ;
         if(req.file){
-            userPhotoPath = `${process.env.BASE_URL_SERVER}/uploads/${req.file.filename}`;
+            const cloudinaryResult = await uploadToCloudinary(req.file.buffer, "auth_user_Photos")
+            userPhotoPath = cloudinaryResult.secure_url;
         }
         const validatedData = userIdValidationSchema.parse(req.body);
         const { id} = validatedData;

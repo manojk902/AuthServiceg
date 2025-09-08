@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import { getUserPhotoByIdController, updateUserInfoController, updateUserPhotoController } from "../controller/userInfo.controller";   
 import { Router } from "express";
 import {getUserInfoByIdController} from "../controller/userInfo.controller";
-import { upload } from "../utils/multer";
+import { uploadUserPhoto } from "../utils/multer";
 const router = Router();
 
 /**
@@ -125,7 +125,7 @@ const router = Router();
  *         description: Internal server error
  */
 
-router.put('/update-user-info', upload.single("user_photo"), (req:Request, res:Response)=>{
+router.put('/update-user-info', uploadUserPhoto, (req:Request, res:Response)=>{
     updateUserInfoController(req, res);
 });
 
@@ -286,7 +286,7 @@ router.get('/get-user-info/:id', (req:Request, res:Response)=>{
  *         description: Internal server error
  */
 
-router.put('/update-user-photo', upload.single("user_photo"),(req:Request, res:Response)=>{
+router.put('/update-user-photo', uploadUserPhoto,(req:Request, res:Response)=>{
     updateUserPhotoController(req, res);
 })
 
