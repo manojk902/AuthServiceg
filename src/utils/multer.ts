@@ -1,20 +1,14 @@
 import multer from "multer";
 
-const storage = multer.diskStorage({
-    destination:"uploads/",
-    filename:(req, file, cb)=>{
-        const uniqueName = Date.now()+"-"+file.originalname;
-        cb(null, uniqueName)
-    }
-})
+const storage = multer.memoryStorage();
 
-const fileFilter = (req:Express.Request, file:Express.Multer.File, cb:multer.FileFilterCallback)=>{
+const fileFilter =(req:Express.Request, file:Express.Multer.File, cb:multer.FileFilterCallback)=>{
     const allowedTypes = ["image/jpeg","image/jpg","image/png"];
-    if(allowedTypes.includes(file.mimetype)){
-        cb(null, true)
+    if(allowedTypes.includes(file.mimetype )){
+        cb(null,true);
     }else{
-        cb(new Error("Only .jpeg, .jpg, .png files are allowed"))
+        cb(new Error("Invalid file type. Only JPEG, JPG, and PNG are allowed."));
     }
 }
 
-export const upload = multer({storage, fileFilter});
+export const uploadUserPhoto = multer({storage, fileFilter}).single("user_photo");
