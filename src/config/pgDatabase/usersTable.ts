@@ -18,8 +18,8 @@ const userTable = async () => {
     failed_login_attempts INT DEFAULT 0,
     account_locked_until TIMESTAMP,
 
-    recovery_email VARCHAR(255),
-    phone_number VARCHAR(20),
+    recovery_email VARCHAR(255) DEFAULT 'recovery@example.com',
+    phone_number VARCHAR(20) DEFAULT '9xxxxxxxxx',
 
     is_suspended BOOLEAN DEFAULT false,
     suspended_reason TEXT,

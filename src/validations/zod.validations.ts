@@ -39,6 +39,12 @@ export const userIdValidationSchema = z.object({
   id: z.coerce.number().min(1, { message: "User ID is required" }),
 });
 
+// -----------------------------------------------USER DELETEION VALIDATION
+export const userDeleteValidationSchema = z.object({
+  id: z.coerce.number().min(1, { message: "User ID is required" }),
+  deleteText: z.string().min(1, { message: "Delete text is required" }),
+});
+
 //-----------------------------------------------DEACTIVATE ACCOUNT VALIDATION
 export const deactivateAccountValidationSchema = z.object({
   id: z.coerce.number().min(1, { message: "User ID is required" }),
@@ -55,19 +61,23 @@ export const suspendAccountValidationSchema = z.object({
 export const updateUserValidationSchema = z.object({
   id: z.coerce.number().min(1, { message: "User ID is required" }),
   first_name: z.string().min(1, { message: "First name is required" }),
-  last_name: z.string().optional(),
+  last_name: z.string(),
   email: z.string().min(1, { message: "Email is required" }).email({ message: "Invalid email format" }),
-  recovery_email: z.string().email({ message: "Invalid recovery email format" }).optional(),
-  phone_number: z.coerce.string().regex(/^[6-9]\d{9}$/, {
-    message: "Phone number must start with 6, 7, 8, or 9 and be exactly 10 digits",
-  }).optional(),
+  recovery_email: z.string().default("recovery@example.com"),
+  phone_number: z.coerce.string().default("9xxxxxxxxx"),
 })
 
 // -----------------------------------------------UPDATE USER INFO VALIDATION
 export const updateUserInfoValidationSchema = z.object({
   id: z.coerce.number().min(1, { message: "User ID is required" }),
-  dob: z.coerce.date().optional(),
-  gender: z.enum(["Male","Female","Other"]).optional(),
-  home_address: z.string().optional(),
-  work_address: z.string().optional(),
+  dob: z.coerce.string(),
+  gender: z.enum(["Male","Female","Other","Not Specified"]).default("Not Specified"),
+  home_address: z.string().default("Not Specified"),
+  work_address: z.string().default("Not Specified"),
 });
+
+// ------------------------------------------------MATCH PASSWORD VALIDATION
+export const matchPasswordValidation = z.object({
+  email: z.string().min(1,{message:"Email is required"}).email({message:"Invalid email format"}),
+  password: z.coerce.string().min(1,{message:"Password is required"})
+})

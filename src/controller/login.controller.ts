@@ -8,7 +8,7 @@ import {
   resetFailedLoginAttempts,
   findAppByUserIdAndAppName
 } from "../service/login.service";
-import { loginValidationSchema } from "../validations/zod.validations";
+import { loginValidationSchema, matchPasswordValidation } from "../validations/zod.validations";
 import z from "zod";
 
 const MAX_FAILED_LOGIN_ATTEMPTS = 5;
@@ -17,7 +17,7 @@ const LOCK_DURATION_MINUTES = 15;
 export const loginUser = async (req: Request, res: Response) => {
   try {
     const validatedData = loginValidationSchema.parse(req.body);
-    const { email, password, app_name  } = validatedData;
+    const { email, password, app_name } = validatedData;
 
     //  Find user first
     const user = await findUserByEmail(email);
@@ -30,7 +30,7 @@ export const loginUser = async (req: Request, res: Response) => {
     }
 
     //  Then find app mapping
-    const appName = await findAppByUserIdAndAppName(user.id, app_name );
+    const appName = await findAppByUserIdAndAppName(user.id, app_name);
 
     //  Check if account is locked
     if (
@@ -109,7 +109,7 @@ export const loginUser = async (req: Request, res: Response) => {
         firstName: user.first_name,
         lastName: user.last_name,
         appName: appName.app_name,
-        
+
       }
     });
 
@@ -118,7 +118,7 @@ export const loginUser = async (req: Request, res: Response) => {
       return res.status(400).json({
         status: "error",
         message: "Validation failed",
-        errors: error.issues 
+        errors: error.issues
       });
     }
 
@@ -129,3 +129,33 @@ export const loginUser = async (req: Request, res: Response) => {
     });
   }
 };
+
+
+// -------------------------------------------------------------------MATCH PASSWORD
+export const matchPassword = async (req: Request, res: Response) => {
+  try {
+    const validatedData = matchPasswordValidation.safeParse(req.body);
+    if (!validatedData.success) {
+      return res.status(403).json({
+        status: "validation_error",
+        message: "Invalid Match password inputs",
+        errors: validatedData.error.format(),
+      });
+    }
+    const { email, password } = validatedData.data;
+    const user = await findUserByEmail(email);
+    if (!user) {
+      return res.status(404).json({
+        status: "user_not_found",
+        message: "User not found! Try again."
+      });
+    }
+    const isPasswordMatch = await checkPassword(password, user.password);
+    return res.status(200).json({status:"success", isPasswordMatch:isPasswordMatch})
+  } catch (error) {
+    return res.status(500).json({
+      status:"error",
+      message:"SERVER ERROR"
+    })
+  }
+}
