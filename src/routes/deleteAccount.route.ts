@@ -9,14 +9,13 @@ const router = Router();
  *   name: Auth
  *   description: Authentication endpoints
  */
-
 /**
  * @swagger
  * /delete-account:
  *   delete:
- *     summary: Delete a user account
+ *     summary: Soft delete (deactivate) a user account
  *     tags: [Auth]
- *     description: Permanently deletes a user account by ID.
+ *     description: Marks a user account as deleted by setting `is_deleted = true` and `deleted_at = NOW()`. Requires confirmation text `"DELETE DRIVEOSX ACCOUNT"`.
  *     requestBody:
  *       required: true
  *       content:
@@ -25,11 +24,16 @@ const router = Router();
  *             type: object
  *             required:
  *               - id
+ *               - deleteText
  *             properties:
  *               id:
  *                 type: integer
  *                 description: ID of the user to delete
  *                 example: 123
+ *               deleteText:
+ *                 type: string
+ *                 description: Confirmation text that must exactly equal `"DELETE DRIVEOSX ACCOUNT"`
+ *                 example: DELETE DRIVEOSX ACCOUNT
  *     responses:
  *       200:
  *         description: User account deleted successfully
@@ -45,7 +49,7 @@ const router = Router();
  *                   type: string
  *                   example: User account deleted successfully
  *       400:
- *         description: Missing or invalid user ID
+ *         description: Validation failed (missing fields or invalid confirmation text)
  *         content:
  *           application/json:
  *             schema:
@@ -56,7 +60,12 @@ const router = Router();
  *                   example: error
  *                 message:
  *                   type: string
- *                   example: User ID is required
+ *                   example: Invalid confirmation text
+ *                 errors:
+ *                   type: array
+ *                   description: List of validation issues (if Zod validation fails)
+ *                   items:
+ *                     type: object
  *       500:
  *         description: Internal server error
  *         content:
@@ -71,6 +80,7 @@ const router = Router();
  *                   type: string
  *                   example: Internal server error
  */
+
 router.delete("/delete-account", (req: Request, res: Response) => {
   deleteUserAccount(req, res);
 });

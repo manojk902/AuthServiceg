@@ -6,9 +6,9 @@ const userInfoTable = async () => {
     user_id INT NOT NULL,
     user_photo VARCHAR(255),
     dob DATE ,
-    gender VARCHAR(50),
-    home_address VARCHAR(255),
-    work_address VARCHAR(255),
+    gender VARCHAR(50) DEFAULT 'Not Specified',
+    home_address VARCHAR(255) DEFAULT 'Enter Home Address',
+    work_address VARCHAR(255) DEFAULT 'Enter Work Address',
     created_at TIMESTAMP NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMP NOT NULL DEFAULT NOW(),
 

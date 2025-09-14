@@ -1,11 +1,16 @@
 import pool from "../config/pgDatabase/dbConnect";
 
 // Function to delete user account
-export const deleteAccountService = async (userId: number): Promise<void> => {
-  await pool.query(
-    `UPDATE users SET is_deleted = true, deleted_at = NOW() WHERE id = $1`,
-    [userId]
-  );
+export const deleteAccountService = async (userId: number, deleteText: string): Promise<void> => {
+  if (deleteText === "DELETE DRIVEOSX ACCOUNT") {
+    await pool.query(
+      `UPDATE users SET is_deleted = true, deleted_at = NOW() WHERE id = $1`,
+      [userId]
+    );
+  } else {
+    throw new Error("Invalid confirmation text");
+  }
+
 }
 
 // Function to recover deleted user account

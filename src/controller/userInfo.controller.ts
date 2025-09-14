@@ -21,6 +21,7 @@ export const updateUserInfoController = async (req: Request, res: Response) => {
         return res.status(200).json({
             status: "success", message: "User info updated successfully", userInfo: {
                 id: updatedUserInfo.user_id,
+                user_photo: updatedUserInfo.user_photo,
                 dob: updatedUserInfo.dob,
                 gender: updatedUserInfo.gender,
                 home_address: updatedUserInfo.home_address,
@@ -53,6 +54,7 @@ export const getUserInfoByIdController = async (req:Request, res:Response)=>{
             status: "success",
             message: "User info fetched successfully",
             userInfo: {
+                user_photo: userInfo.user_photo,
                 dob: userInfo.dob,
                 gender: userInfo.gender,
                 home_address: userInfo.home_address,
