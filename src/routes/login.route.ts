@@ -1,4 +1,4 @@
-import { loginUser } from "../controller/login.controller";
+import { loginUser, matchPassword } from "../controller/login.controller";
 import { Request, Response, Router } from "express";
 
 const router = Router();
@@ -108,5 +108,94 @@ const router = Router();
 router.post("/login", (req: Request, res: Response) => {
   loginUser(req, res);
 });
+
+
+/**
+ * @swagger
+ * /check-password:
+ *   post:
+ *     summary: Check if the provided password matches the user's stored password
+ *     tags: [Auth]
+ *     description: Validates user credentials by checking if the given password matches the saved password for the user with the provided email.
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - email
+ *               - password
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 format: email
+ *                 description: The user's email address
+ *                 example: test@example.com
+ *               password:
+ *                 type: string
+ *                 format: password
+ *                 description: The user's password
+ *                 example: mySecretPass123
+ *     responses:
+ *       200:
+ *         description: Password check result
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: success
+ *                 isPasswordMatch:
+ *                   type: boolean
+ *                   example: true
+ *       403:
+ *         description: Validation error - missing or invalid fields
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: validation_error
+ *                 message:
+ *                   type: string
+ *                   example: Invalid Match password inputs
+ *                 errors:
+ *                   type: object
+ *                   description: Details of validation errors
+ *       404:
+ *         description: User not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: user_not_found
+ *                 message:
+ *                   type: string
+ *                   example: User not found! Try again.
+ *       500:
+ *         description: Server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: error
+ *                 message:
+ *                   type: string
+ *                   example: SERVER ERROR
+ */
+router.post("/check-password",(req:Request, res:Response)=>{
+  matchPassword(req, res);
+})
 
 export default router;
