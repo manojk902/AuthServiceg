@@ -2,7 +2,7 @@ import bcrypt from "bcryptjs";
 import crypto from "crypto";
 import pool from "../config/pgDatabase/dbConnect";
 
-import transporter from "../utils/transporter";
+import {transporter} from "../utils/transporter";
 
 // ------------------------------------------------------------------USER SIGNUP SERVICE
 export const signupUser = async (
@@ -77,14 +77,13 @@ export const signupUser = async (
 
 // ----------------------------------------SEND VERIFICATION EMAIL
 const sendVerificationEmail = async (to: string, url: string) => {
-  transporter;
 
-  await transporter.sendMail({
-    from: `"DriveOSx" <${process.env.SMTP_EMAIL}>`,
+  await transporter(
     to,
-    subject: "Verify your email",
-    html: `<p>Please verify your email by clicking <a href="${url}" > Click to Verify </a>   </p>`,
-  });
+    "Verify your email",
+    `<p>Welcome to DriveOSx </p>
+     <p>Click <a href="${url}">here</a> to verify your account.</p>`
+  );
 };
 
 // ----------------------------------------GET USER BY ID
