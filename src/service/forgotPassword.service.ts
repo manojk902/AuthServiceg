@@ -1,10 +1,10 @@
 import crypto from "crypto";
 import bcrypt from "bcryptjs";
 import pool from "../config/pgDatabase/dbConnect";
-import {transporter} from "../utils/transporter";
+import { transporter } from "../utils/transporter";
 
 // handel forgot password
-export const handleForgotPassword = async (email: string, useRecoveryEmail:false) => {
+export const handleForgotPassword = async (email: string, useRecoveryEmail:boolean = false) => {
   const userQuery = useRecoveryEmail
     ? `SELECT * FROM users WHERE recovery_email = $1`
     : `SELECT * FROM users WHERE email = $1`;
@@ -12,11 +12,17 @@ export const handleForgotPassword = async (email: string, useRecoveryEmail:false
   const userResult = await pool.query(userQuery, [email]);
   const user = userResult.rows[0];
 
-  if (!user) throw new Error("User not found");
+  if (!user) {
+    throw new Error(
+      useRecoveryEmail
+        ? "No user found with this recovery email"
+        : "No user found with this primary email"
+    );
+  }
 
   const token = crypto.randomBytes(32).toString("hex");
   const expiry = new Date(Date.now() + 1000 * 60 * 15); // 15 min
-  console.log("token forgot",token)
+  console.log("token forgot", token)
 
 
   await pool.query(
@@ -24,7 +30,7 @@ export const handleForgotPassword = async (email: string, useRecoveryEmail:false
     [token, expiry, email]
   );
 
-  const resetLink = `${process.env.UI_URL}/reset-password?resetPasswordToken=${token}`; 
+  const resetLink = `${process.env.UI_URL}/reset-password?resetPasswordToken=${token}`;
   await transporter(
     useRecoveryEmail ? user.recovery_email : user.email,
     "Reset your password",
@@ -44,7 +50,7 @@ export const handleResetPassword = async (
   const user = result.rows[0];
   console.log("forgot user", user)
   if (!user) throw new Error("Invalid or Expired Token");
-  const newHashedPassword =await bcrypt.hash(newPassword, 10);
+  const newHashedPassword = await bcrypt.hash(newPassword, 10);
   await pool.query(
     `UPDATE users SET password = $1, reset_token = NULL, reset_token_expiry = NULL WHERE email = $2`,
     [newHashedPassword, user.email]

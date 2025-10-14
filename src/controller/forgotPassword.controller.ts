@@ -9,7 +9,8 @@ import { forgotPasswordValidationSchema, resetPasswordValidationSchema } from ".
 // ------------------------------------------------------------------------FORGOT PASSWORD CONTROLLER
 export const forgotPassword = async (req: Request, res: Response) => {
   try {
-    const { email, useRecoveryEmail } = req.body;
+    const { email } = req.body;
+    const useRecoveryEmail = !!req.body.useRecoveryEmail;
     await handleForgotPassword(email, useRecoveryEmail);
     res
       .status(201)
