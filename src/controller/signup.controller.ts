@@ -2,7 +2,7 @@ import { getUserById, signupUser, updateUserbyId } from "../service/signup.servi
 import { Request, Response } from "express";
 import crypto from "crypto";
 import pool from "../config/pgDatabase/dbConnect";
-import transporter from "../utils/transporter";
+import {transporter} from "../utils/transporter";
 import { signupValidationSchema, updateUserValidationSchema, userIdValidationSchema } from "../validations/zod.validations";
 import z from "zod";
 
@@ -26,12 +26,11 @@ export const signup = async (req: Request, res: Response) => {
         );
 
         const newVerificationUrl = `${process.env.BASE_URL_SERVER}/api/v1/auth/verify-email?emailVerifyToken=${newVerificationToken}`;
-        await transporter.sendMail({
-          from: `"Auth Service" <${process.env.SMTP_EMAIL}>`,
-          to: existingUser.email,
-          subject: "Verify your email",
-          html: `<p>Please verify your email by clicking <a href="${newVerificationUrl}">Click to Verify</a></p>`,
-        });
+        await transporter(
+          existingUser.email,
+          "Verify your email",
+          `<p>Please verify your email by clicking <a href="${newVerificationUrl}">Click to Verify</a></p>`
+        );
 
         return res.status(200).json({
           status: "success",
