@@ -11,10 +11,10 @@ export  const  transporter = async (to: string, subject: string, html: string) =
       html,
     });
 
-    console.log("✅ Email sent:", data);
+    console.log("Email sent:", data);
     return data;
   } catch (error) {
-    console.error("❌ Email send error:", error);
+    console.error("Email send error:", error);
     throw new Error("Failed to send email");
   }
 };
