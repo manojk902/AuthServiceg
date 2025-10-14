@@ -1,7 +1,7 @@
 import crypto from "crypto";
 import bcrypt from "bcryptjs";
 import pool from "../config/pgDatabase/dbConnect";
-import transporter from "../utils/transporter";
+import {transporter} from "../utils/transporter";
 
 // handel forgot password
 export const handleForgotPassword = async (email: string, useRecoveryEmail:false) => {
@@ -25,12 +25,11 @@ export const handleForgotPassword = async (email: string, useRecoveryEmail:false
   );
 
   const resetLink = `${process.env.UI_URL}/reset-password?resetPasswordToken=${token}`; 
-  await transporter.sendMail({
-    from: `"Drive OSx" <${process.env.SMTP_EMAIL}>`,
-    to: useRecoveryEmail ? user.recovery_email : user.email,
-    subject: "Reset your password",
-    html: `<p>Click <a href="${resetLink}">here</a> to reset your password. Link expires in 15 minutes.</p>`,
-  });
+  await transporter(
+    useRecoveryEmail ? user.recovery_email : user.email,
+    "Reset your password",
+    `<p>Click <a href="${resetLink}">here</a> to reset your password. Link expires in 15 minutes.</p>`
+  );
 };
 
 // handle reset password
