@@ -64,7 +64,8 @@ export const updateUserValidationSchema = z.object({
   last_name: z.string(),
   email: z.string().min(1, { message: "Email is required" }).email({ message: "Invalid email format" }),
   recovery_email: z.string().default("recovery@example.com"),
-  phone_number: z.coerce.string().default("9xxxxxxxxx"),
+  phone_number: z.coerce.string().regex(/^[6-9]\d{9}$/, "Phone number must start with 6, 7, 8, or 9 and be 10 digits long")
+  .default("9xxxxxxxxx")
 })
 
 // -----------------------------------------------UPDATE USER INFO VALIDATION
